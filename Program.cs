@@ -44,7 +44,7 @@ namespace ChatRoom
 
         private static void DisplayMenu()
         {
-            Console.WriteLine("\n=== Welcome to ChatRoom ===");
+            Console.WriteLine("=== Welcome to ChatRoom ===");
             Console.WriteLine("1. Register");
             Console.WriteLine("2. Login");
             Console.WriteLine("0. Exit");
@@ -68,16 +68,22 @@ namespace ChatRoom
             Console.Write("Enter password: ");
             string password = Console.ReadLine() ?? "";
 
-            if (users.Exists(u => u.Username == username))
+            // Check if username already exists
+            foreach (User u in users)
             {
-                Console.WriteLine("Username already exists!");
-                return;
+                if (u.Username == username)
+                {
+                    Console.WriteLine("Username already exists!");
+                    return; // stop registration
+                }
             }
 
+            // Create and add the new user
             var user = new User(username, password);
             users.Add(user);
             Console.WriteLine("Registration successful!");
         }
+
 
         private static void Login()
         {
@@ -86,11 +92,21 @@ namespace ChatRoom
             Console.Write("Enter password: ");
             string password = Console.ReadLine() ?? "";
 
-            var tempUser = new User("", ""); // placeholder for method call
-            if (tempUser.Login(username, password, users))
+            bool loggedIn = false;
+
+            foreach (User u in users)
             {
-                currentUser = users.Find(u => u.Username == username);
-                Console.WriteLine($"Welcome back, {currentUser!.Username}!");
+                if (u.Username == username && u.Password == password)
+                {
+                    currentUser = u;  // set the logged-in user
+                    loggedIn = true;
+                    break;  // stop checking after we find the user
+                }
+            }
+
+            if (loggedIn)
+            {
+                Console.WriteLine($"Welcome back, {currentUser.Username}!");
             }
             else
             {
